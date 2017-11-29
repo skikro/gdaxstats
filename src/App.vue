@@ -1,9 +1,21 @@
 <template>
     <div id="app">
         <h1>GDAX Stats</h1>
-        <h3>ETH/USD</h3>
-            <p>ETH Price ($USD): {{ethPrice}} </p>
-            <button type="button" @click.prevent="fetchData">Update!</button>
+        <button type="button" @click.prevent="fetchData">Update!</button>
+        <table>
+            <tr>
+                <th>Currency</th>
+                <th>Current Price</th>
+            </tr>
+            <tr>
+                <td>ETH</td>
+                <td>{{ethPrice | dollar}}</td>
+            </tr>
+            <tr>
+                <td>BTC</td>
+                <td>{{btcPrice | dollar}}</td>
+            </tr>
+        </table>
     </div>
 </template>
 
@@ -12,7 +24,13 @@
         name: 'app',
         data () {
             return {
-                ethPrice: 1000000
+                ethPrice: 1000000,
+                btcPrice: 200000
+            }
+        },
+        filters: {
+            dollar: function(val) {
+                return "$" + parseFloat(Math.round(val * 100) / 100).toFixed(2);
             }
         },
         methods: {
@@ -23,6 +41,13 @@
                     })
                     .then(data => {
                         this.ethPrice = data.price;
+                    });
+                this.$http.get('https://api.gdax.com/products/BTC-USD/ticker')
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.btcPrice = data.price;
                     });
             }
         }
